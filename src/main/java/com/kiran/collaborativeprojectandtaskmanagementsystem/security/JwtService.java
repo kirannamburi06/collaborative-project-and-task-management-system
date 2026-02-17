@@ -1,5 +1,6 @@
 package com.kiran.collaborativeprojectandtaskmanagementsystem.security;
 
+import com.kiran.collaborativeprojectandtaskmanagementsystem.config.JwtProperties;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -13,8 +14,13 @@ import java.util.Date;
 @Service
 public class JwtService {
 
-    private final String secret = "this-is-a-very-very-long-secret-key-for-signing-jwt-tokens-aaaaaaaaaaaaaaaaaaaaaaa";
-    private final long expiration = 3600000;
+    private final String secret;
+    private final long expiration;
+
+    public JwtService(JwtProperties jwtProperties){
+        this.secret = jwtProperties.getSecret();
+        this.expiration = jwtProperties.getExpiration();
+    }
 
     public Key getKey(){
         return Keys.hmacShaKeyFor(secret.getBytes());

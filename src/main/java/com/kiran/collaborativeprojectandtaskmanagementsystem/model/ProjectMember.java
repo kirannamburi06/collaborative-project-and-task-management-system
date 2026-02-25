@@ -37,4 +37,7 @@ public class ProjectMember {
     @JsonFormat(pattern = "dd-MM-yyyy hh:mm:ss a")
     private LocalDateTime joinedAt;
 
+    @ManyToOne(optional = true)
+    private Users invitedBy;
+
 }

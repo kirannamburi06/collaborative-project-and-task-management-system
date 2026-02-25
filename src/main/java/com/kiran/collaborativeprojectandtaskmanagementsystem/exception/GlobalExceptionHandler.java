@@ -18,4 +18,30 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(409).body(error);
     }
 
+    @ExceptionHandler(ProjectNotFoundException.class)
+    public ResponseEntity<ApiError> handleProjectNotFoundException(ProjectNotFoundException e){
+        log.error(e.getMessage());
+
+        ApiError error = new ApiError(e.getMessage());
+
+        return ResponseEntity.status(404).body(error);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ApiError> handleUserNotFoundException(UserNotFoundException e){
+        log.error(e.getMessage());
+
+        ApiError error = new ApiError(e.getMessage());
+
+        return ResponseEntity.status(404).body(error);
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ApiError> handleRuntimeException(RuntimeException e){
+        log.error(e.getMessage());
+
+        ApiError error = new ApiError(e.getMessage());
+
+        return ResponseEntity.status(404).body(error);
+    }
 }

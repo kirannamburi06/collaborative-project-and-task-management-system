@@ -1,6 +1,8 @@
 package com.kiran.collaborativeprojectandtaskmanagementsystem.controller;
 
 import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.CreateProjectRequestDTO;
+import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.InviteUserRequestDTO;
+import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.ProjectMemberResponseDTO;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.ProjectResponseDTO;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.model.Project;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.model.Users;
@@ -39,6 +41,35 @@ public class ProjectController {
         List<ProjectResponseDTO> projectList = projectService.getProjects(user);
 
         return ResponseEntity.status(200).body(projectList);
+    }
+
+    @PostMapping("/{id}/invite")
+    public ResponseEntity<?> inviteUserToProject(@RequestBody InviteUserRequestDTO request,
+                                                 @AuthenticationPrincipal UserPrincipal userPrincipal,
+                                                 @PathVariable Long id){
+        Users user = userPrincipal.getUser();
+        projectService.inviteUserToProject(request, user, id);
+
+        return ResponseEntity.status(200).body("Invite request sent");
+    }
+
+    @PostMapping("/{id}/accept")
+    public ResponseEntity<?> acceptInvite(@AuthenticationPrincipal UserPrincipal userPrincipal,
+                                          @PathVariable Long id){
+        Users user = userPrincipal.getUser();
+        projectService.acceptInvite(user, id);
+
+        return ResponseEntity.status(200).body("Invitation accepted");
+    }
+
+    @GetMapping("/invitations")
+    public ResponseEntity<?> getInvitations(@AuthenticationPrincipal UserPrincipal userPrincipal){
+
+        Users user = userPrincipal.getUser();
+        List<ProjectMemberResponseDTO> invitations = projectService.getAllInvitations(user);
+
+        return ResponseEntity.status(200).body(invitations);
+
     }
 
 }

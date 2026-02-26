@@ -10,7 +10,7 @@ public class ProjectMemberMapper {
         ProjectMemberResponseDTO dto = new ProjectMemberResponseDTO();
         dto.setProjectId(member.getProject().getId());
         dto.setProjectName(member.getProject().getName());
-        dto.setRole(String.valueOf(member.getRole()));
+        //dto.setRole(String.valueOf(member.getRole()));
         dto.setInvitedBy(member.getInvitedBy().getUsername());
 
         return dto;

@@ -121,14 +121,12 @@ public class ProjectService {
 
     public List<ProjectMemberResponseDTO> getAllInvitations(Users user){
 
-        List<ProjectMember> invitations = projectMemberRepo.findByUserAndStatus(user, InvitationStatus.INVITED);
+        List<ProjectMemberResponseDTO> invitations =  projectMemberRepo.findAllInvitationsDTO(user, InvitationStatus.INVITED);
 
         if(invitations == null){
-            throw new RuntimeException("No invitations found");
+            throw new RuntimeException("No invitatins");
         }
 
-        return invitations.stream()
-                .map(projectMemberMapper::toDTO)
-                .toList();
+        return invitations;
     }
 }

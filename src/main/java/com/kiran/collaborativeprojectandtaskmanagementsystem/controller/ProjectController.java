@@ -4,16 +4,15 @@ import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.CreateProjectRe
 import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.InviteUserRequestDTO;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.ProjectMemberResponseDTO;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.ProjectResponseDTO;
-import com.kiran.collaborativeprojectandtaskmanagementsystem.model.Project;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.model.Users;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.security.UserPrincipal;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.service.ProjectService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/projects")
@@ -38,7 +37,7 @@ public class ProjectController {
     public ResponseEntity<?> getProjects(@AuthenticationPrincipal UserPrincipal userPrincipal){
         Users user = userPrincipal.getUser();
 
-        List<ProjectResponseDTO> projectList = projectService.getProjects(user);
+        Map<Long, ProjectResponseDTO> projectList = projectService.getProjects(user);
 
         return ResponseEntity.status(200).body(projectList);
     }
@@ -70,6 +69,15 @@ public class ProjectController {
 
         return ResponseEntity.status(200).body(invitations);
 
+    }
+
+    @PostMapping("/{id}/reject")
+    public ResponseEntity<?> rejectInvite(@AuthenticationPrincipal UserPrincipal userPrincipal,
+                                          @PathVariable Long id){
+        Users user = userPrincipal.getUser();
+        projectService.rejectInvite(user, id);
+
+        return ResponseEntity.status(200).body("Rejected invitation");
     }
 
 }

@@ -1,5 +1,6 @@
 package com.kiran.collaborativeprojectandtaskmanagementsystem.dto;
 
+import com.kiran.collaborativeprojectandtaskmanagementsystem.model.ProjectRole;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,13 +13,14 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProjectResponseDTO {
+public class ProjectFlatDTO {
 
     private Long id;
     private String name;
     private String Description;
     private LocalDateTime createdAt;
     private String createdBy;
-    private List<String> members;
+    private String username;
+    private ProjectRole role;
 
 }

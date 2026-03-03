@@ -1,5 +1,6 @@
 package com.kiran.collaborativeprojectandtaskmanagementsystem.controller;
 
+import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.AssignUserRequest;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.CreateTaskRequestDTO;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.TaskResponseDTO;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.model.Users;
@@ -39,6 +40,18 @@ public class TaskController {
         List<TaskResponseDTO> tasks = taskService.getAllTasks(user, projectId);
 
         return ResponseEntity.status(200).body(tasks);
+    }
+
+    @PostMapping("/{projectId}/tasks/{taskId}/assign")
+    public ResponseEntity<?> assignUserToTask(@PathVariable Long projectId,
+                                              @PathVariable Long taskId,
+                                              @RequestBody AssignUserRequest assignUserRequest,
+                                              @AuthenticationPrincipal UserPrincipal userPrincipal){
+        Users user = userPrincipal.getUser();
+
+        taskService.assignUserToTask(projectId, taskId, assignUserRequest, user);
+
+        return ResponseEntity.status(200).body("User successfully assigned to task");
     }
 
 }

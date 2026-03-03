@@ -146,7 +146,7 @@ public class ProjectService {
         List<ProjectMemberResponseDTO> invitations =  projectMemberRepo.findAllInvitationsDTO(user, InvitationStatus.INVITED);
 
         if(invitations == null){
-            throw new RuntimeException("No invitatins");
+            throw new RuntimeException("No invitations");
         }
 
         return invitations;

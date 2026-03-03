@@ -36,6 +36,9 @@ public class Project {
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProjectMember> members = new ArrayList<>();
 
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Task> tasks = new ArrayList<>();
+
     @JsonFormat(pattern = "dd-MM-yyyy hh:mm:ss a")
     @Column(updatable = false, nullable = false)
     private LocalDateTime createdAt;

@@ -80,4 +80,14 @@ public class ProjectController {
         return ResponseEntity.status(200).body("Rejected invitation");
     }
 
+    @DeleteMapping("/{projectId}")
+    public ResponseEntity<?> deleteProject(@PathVariable Long projectId,
+                                           @AuthenticationPrincipal UserPrincipal userPrincipal){
+
+        Users user = userPrincipal.getUser();
+
+        projectService.deleteProject(projectId, user);
+
+        return ResponseEntity.status(200).body("Project deleted successfully");
+    }
 }

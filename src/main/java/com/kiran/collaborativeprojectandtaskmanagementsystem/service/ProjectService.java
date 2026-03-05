@@ -172,4 +172,24 @@ public class ProjectService {
         member.setStatus(InvitationStatus.REJECTED);
 
     }
+
+    @Transactional
+    public void deleteProject(Long projectId, Users user) {
+
+        Project project = projectRepo.findById(projectId).orElseThrow(
+                () -> new ProjectNotFoundException("Project with id : " + projectId + " not found")
+        );
+
+        ProjectMember member = projectMemberRepo.findByProjectAndUser(project, user);
+
+        if(member == null || member.getStatus() != InvitationStatus.ACTIVE){
+            throw new RuntimeException("You are not an active member in this project");
+        }
+
+        if(!project.getCreatedBy().getId().equals(user.getId())){
+            throw new RuntimeException("Only owner can delete project");
+        }
+
+        projectRepo.delete(project);
+    }
 }

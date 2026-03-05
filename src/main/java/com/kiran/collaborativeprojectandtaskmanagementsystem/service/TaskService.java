@@ -103,4 +103,29 @@ public class TaskService {
         task.setAssignedUser(assignedUser);
 
     }
+
+    @Transactional
+    public void updateTaskStatus(Long projectId, Long taskId, TaskStatus status, Users user){
+
+        Project project = projectRepo.findById(projectId)
+                .orElseThrow(() -> new ProjectNotFoundException("Project with id: " + projectId + " not found"));
+
+        Task task = taskRepo.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Task with id: " + taskId + " not found"));
+
+        if (!task.getProject().getId().equals(projectId)) {
+            throw new RuntimeException("Task does not belong to this project");
+        }
+
+        ProjectMember member = projectMemberRepo.findByProjectAndUser(project, user);
+        if(member == null || member.getStatus() != InvitationStatus.ACTIVE) {
+            throw new RuntimeException("You are not a member in this project");
+        }
+        if(member.getRole() != ProjectRole.OWNER && member.getRole() != ProjectRole.ADMIN && task.getCreatedBy() != user){
+            throw new RuntimeException("Insufficient privileges");
+        }
+
+        task.setStatus(status);
+
+    }
 }

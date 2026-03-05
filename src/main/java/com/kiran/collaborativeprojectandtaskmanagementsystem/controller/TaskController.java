@@ -3,10 +3,13 @@ package com.kiran.collaborativeprojectandtaskmanagementsystem.controller;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.AssignUserRequest;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.CreateTaskRequestDTO;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.TaskResponseDTO;
+import com.kiran.collaborativeprojectandtaskmanagementsystem.model.TaskStatus;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.model.Users;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.security.UserPrincipal;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.service.TaskService;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -52,6 +55,23 @@ public class TaskController {
         taskService.assignUserToTask(projectId, taskId, assignUserRequest, user);
 
         return ResponseEntity.status(200).body("User successfully assigned to task");
+    }
+
+    @PostMapping("/{projectId}/tasks/{taskId}/update")
+    public ResponseEntity<?> updateTaskStatus(@PathVariable Long projectId,
+                                              @PathVariable Long taskId,
+                                              @RequestParam(required = false) TaskStatus status,
+                                              @AuthenticationPrincipal UserPrincipal userPrincipal){
+        if(status == null){
+            status = TaskStatus.IN_PROGRESS;
+        }
+
+        Users user = userPrincipal.getUser();
+
+        taskService.updateTaskStatus(projectId, taskId, status, user);
+
+        return ResponseEntity.status(200).body("Updated the status successfully");
+
     }
 
 }

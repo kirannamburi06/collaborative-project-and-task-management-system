@@ -57,7 +57,7 @@ public class TaskController {
         return ResponseEntity.status(200).body("User successfully assigned to task");
     }
 
-    @PostMapping("/{projectId}/tasks/{taskId}/update")
+    @PatchMapping("/{projectId}/tasks/{taskId}/update")
     public ResponseEntity<?> updateTaskStatus(@PathVariable Long projectId,
                                               @PathVariable Long taskId,
                                               @RequestParam(required = false) TaskStatus status,
@@ -74,4 +74,16 @@ public class TaskController {
 
     }
 
+    @DeleteMapping("/{projectId}/tasks/{taskId}")
+    public ResponseEntity<?> deleteTask(@PathVariable Long projectId,
+                                        @PathVariable Long taskId,
+                                        @AuthenticationPrincipal UserPrincipal userPrincipal){
+
+        Users user = userPrincipal.getUser();
+
+        taskService.deleteTask(projectId, taskId, user);
+
+        return ResponseEntity.status(200).body("Deleted the task successfully");
+
+    }
 }

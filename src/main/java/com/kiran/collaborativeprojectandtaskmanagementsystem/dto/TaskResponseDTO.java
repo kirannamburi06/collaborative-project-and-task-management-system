@@ -1,5 +1,6 @@
 package com.kiran.collaborativeprojectandtaskmanagementsystem.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.model.TaskStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,7 +21,11 @@ public class TaskResponseDTO {
     private TaskStatus status;
     private String assignedUser;
     private String createdBy;
+
+    @JsonFormat(pattern = "dd-MM-yyyy hh:mm:ss a")
     private LocalDateTime createdAt;
+
+    @JsonFormat(pattern = "dd-MM-yyyy hh:mm:ss a")
     private LocalDateTime updatedAt;
 
 }

@@ -1,6 +1,8 @@
 package com.kiran.collaborativeprojectandtaskmanagementsystem.controller;
 
 import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.*;
+import com.kiran.collaborativeprojectandtaskmanagementsystem.model.InvitationStatus;
+import com.kiran.collaborativeprojectandtaskmanagementsystem.model.ProjectRole;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.model.Users;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.security.UserPrincipal;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.service.ProjectService;
@@ -36,10 +38,17 @@ public class ProjectController {
 
     @GetMapping
     public ResponseEntity<?> getProjects(@AuthenticationPrincipal UserPrincipal userPrincipal,
-                                         @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable){
+                                         @RequestParam(required = false) InvitationStatus status,
+                                         @RequestParam(required = false) ProjectRole role,
+                                         @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
+                                         Pageable pageable){
         Users user = userPrincipal.getUser();
 
-        PageResponseDTO<ProjectResponseDTO> projectList = projectService.getProjects(user, pageable);
+        PageResponseDTO<ProjectResponseDTO> projectList = projectService.getProjects(
+                user,
+                status,
+                role,
+                pageable);
 
         return ResponseEntity.status(200).body(projectList);
     }

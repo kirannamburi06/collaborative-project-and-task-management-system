@@ -2,10 +2,7 @@ package com.kiran.collaborativeprojectandtaskmanagementsystem.repository;
 
 import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.ProjectMemberProjection;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.ProjectMemberResponseDTO;
-import com.kiran.collaborativeprojectandtaskmanagementsystem.model.InvitationStatus;
-import com.kiran.collaborativeprojectandtaskmanagementsystem.model.Project;
-import com.kiran.collaborativeprojectandtaskmanagementsystem.model.ProjectMember;
-import com.kiran.collaborativeprojectandtaskmanagementsystem.model.Users;
+import com.kiran.collaborativeprojectandtaskmanagementsystem.model.*;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.ProjectProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -42,15 +39,16 @@ public interface ProjectMemberRepo extends JpaRepository<ProjectMember, Long> {
                 p.description as description,
                 p.createdAt as createdAt,
                 p.createdBy.username as createdBy
-                
         from ProjectMember pm
         join pm.project p
         where pm.user = :user
-        and pm.status = 'ACTIVE'
-        
+        and pm.status = :status
+        and (:role is null or pm.role = :role)
 """)
     Page<ProjectProjection> findProjectsForUser(@Param("user") Users user,
-                                               Pageable pageable);
+                                                @Param("status") InvitationStatus status,
+                                                @Param("role") ProjectRole role,
+                                                Pageable pageable);
     @Query("""
         select pm.project.id as projectId,
                 pm.user.username as username

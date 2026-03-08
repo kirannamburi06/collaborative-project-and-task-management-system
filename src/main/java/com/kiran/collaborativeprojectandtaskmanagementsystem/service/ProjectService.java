@@ -9,7 +9,6 @@ import com.kiran.collaborativeprojectandtaskmanagementsystem.repository.UserRepo
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -44,9 +43,20 @@ public class ProjectService {
 
     }
 
-    public PageResponseDTO<ProjectResponseDTO> getProjects(Users user, Pageable pageable) {
+    public PageResponseDTO<ProjectResponseDTO> getProjects(Users user,
+                                                           InvitationStatus status,
+                                                           ProjectRole role,
+                                                           Pageable pageable) {
 
-        Page<ProjectProjection> projectPage = projectMemberRepo.findProjectsForUser(user, pageable);
+        if(status == null){
+            status = InvitationStatus.ACTIVE;
+        }
+
+        Page<ProjectProjection> projectPage = projectMemberRepo.findProjectsForUser(
+                user,
+                status,
+                role,
+                pageable);
 
         List<Long> projectIds = projectPage.getContent().stream()
                 .map(ProjectProjection::getId)

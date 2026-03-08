@@ -2,6 +2,7 @@ package com.kiran.collaborativeprojectandtaskmanagementsystem.controller;
 
 import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.AssignUserRequest;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.CreateTaskRequestDTO;
+import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.PageResponseDTO;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.TaskResponseDTO;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.model.TaskStatus;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.model.Users;
@@ -9,7 +10,11 @@ import com.kiran.collaborativeprojectandtaskmanagementsystem.security.UserPrinci
 import com.kiran.collaborativeprojectandtaskmanagementsystem.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
+import org.springframework.core.Ordered;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -37,10 +42,12 @@ public class TaskController {
 
     @GetMapping("/{projectId}/tasks")
     public ResponseEntity<?> getAllTasks(@PathVariable Long projectId,
-                                         @AuthenticationPrincipal UserPrincipal userPrincipal){
+                                         @AuthenticationPrincipal UserPrincipal userPrincipal,
+                                         @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
+                                             Pageable pageable){
         Users user = userPrincipal.getUser();
 
-        List<TaskResponseDTO> tasks = taskService.getAllTasks(user, projectId);
+        PageResponseDTO<TaskResponseDTO> tasks = taskService.getAllTasks(user, projectId, pageable);
 
         return ResponseEntity.status(200).body(tasks);
     }

@@ -2,6 +2,8 @@ package com.kiran.collaborativeprojectandtaskmanagementsystem.repository;
 
 import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.TaskResponseDTO;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.model.Task;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -27,8 +29,8 @@ public interface TaskRepo extends JpaRepository<Task, Long> {
         left join t.assignedUser assigned
         join t.createdBy creator
         where t.project.id = :projectId
-        order by t.createdAt desc
 """)
-    List<TaskResponseDTO> getAllTasks(@Param("projectId") Long projectId);
+    Page<TaskResponseDTO> getAllTasks(@Param("projectId") Long projectId,
+                                      Pageable pageable);
 
 }

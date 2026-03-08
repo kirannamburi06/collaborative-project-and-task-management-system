@@ -1,9 +1,6 @@
 package com.kiran.collaborativeprojectandtaskmanagementsystem.service;
 
-import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.AssignUserRequest;
-import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.CreateTaskRequestDTO;
-import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.TaskMapper;
-import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.TaskResponseDTO;
+import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.*;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.exception.ProjectNotFoundException;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.exception.UserNotFoundException;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.model.*;
@@ -13,6 +10,8 @@ import com.kiran.collaborativeprojectandtaskmanagementsystem.repository.TaskRepo
 import com.kiran.collaborativeprojectandtaskmanagementsystem.repository.UserRepo;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -55,7 +54,9 @@ public class TaskService {
         taskRepo.save(task);
     }
 
-    public List<TaskResponseDTO> getAllTasks(Users user, Long projectId) {
+    public PageResponseDTO<TaskResponseDTO> getAllTasks(Users user,
+                                                        Long projectId,
+                                                        Pageable pageable) {
 
         Project project = projectRepo.findById(projectId)
                 .orElseThrow(() -> new ProjectNotFoundException("Project with id: " + projectId + " not found"));
@@ -65,8 +66,15 @@ public class TaskService {
             throw new RuntimeException("You are not a member in this project");
         }
 
-        return taskRepo.getAllTasks(projectId);
+        Page<TaskResponseDTO> response = taskRepo.getAllTasks(projectId, pageable);
 
+        return new PageResponseDTO<TaskResponseDTO>(
+                response.getContent(),
+                response.getNumber(),
+                response.getSize(),
+                response.getTotalElements(),
+                response.getTotalPages()
+        );
     }
 
     @Transactional

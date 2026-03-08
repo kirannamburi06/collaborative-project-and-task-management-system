@@ -1,12 +1,14 @@
 package com.kiran.collaborativeprojectandtaskmanagementsystem.repository;
 
-import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.ProjectFlatDTO;
+import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.ProjectMemberProjection;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.ProjectMemberResponseDTO;
-import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.ProjectResponseDTO;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.model.InvitationStatus;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.model.Project;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.model.ProjectMember;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.model.Users;
+import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.ProjectProjection;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -35,20 +37,27 @@ public interface ProjectMemberRepo extends JpaRepository<ProjectMember, Long> {
                                                          @Param("status") InvitationStatus status);
 
     @Query("""
-        select new com.kiran.collaborativeprojectandtaskmanagementsystem.dto.ProjectFlatDTO(
-            p.id,
-            p.name,
-            p.description,
-            p.createdAt,
-            p.createdBy.username,
-            m.user.username,
-            m.role
-        )
+        select p.id as id,
+                p.name as name,
+                p.description as description,
+                p.createdAt as createdAt,
+                p.createdBy.username as createdBy
+                
         from ProjectMember pm
         join pm.project p
-        join p.members m
         where pm.user = :user
         and pm.status = 'ACTIVE'
+        
 """)
-    List<ProjectFlatDTO> getProjectsWithMembers(@Param("user") Users user);
+    Page<ProjectProjection> findProjectsForUser(@Param("user") Users user,
+                                               Pageable pageable);
+    @Query("""
+        select pm.project.id as projectId,
+                pm.user.username as username
+        from ProjectMember pm
+        where pm.project.id in :projectIds
+        and pm.status = 'ACTIVE'
+        
+""")
+    List<ProjectMemberProjection> findMembersByProjectIds(@Param("projectIds") List<Long> projectIds);
 }

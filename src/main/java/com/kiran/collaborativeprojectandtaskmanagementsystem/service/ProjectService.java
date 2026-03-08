@@ -8,11 +8,15 @@ import com.kiran.collaborativeprojectandtaskmanagementsystem.repository.ProjectR
 import com.kiran.collaborativeprojectandtaskmanagementsystem.repository.UserRepo;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -40,27 +44,42 @@ public class ProjectService {
 
     }
 
-    public Map<Long, ProjectResponseDTO> getProjects(Users user) {
+    public PageResponseDTO<ProjectResponseDTO> getProjects(Users user, Pageable pageable) {
 
-        List<ProjectFlatDTO> projects = projectMemberRepo.getProjectsWithMembers(user);
+        Page<ProjectProjection> projectPage = projectMemberRepo.findProjectsForUser(user, pageable);
 
-        Map<Long, ProjectResponseDTO> grouped = new LinkedHashMap<>();
-        for(ProjectFlatDTO flatDTO : projects) {
-            Long projectId = flatDTO.getId();
-            if(!grouped.containsKey(projectId)){
-                grouped.put(projectId, new ProjectResponseDTO(
-                        flatDTO.getId(),
-                        flatDTO.getName(),
-                        flatDTO.getDescription(),
-                        flatDTO.getCreatedAt(),
-                        flatDTO.getCreatedBy(),
-                        new ArrayList<>()
+        List<Long> projectIds = projectPage.getContent().stream()
+                .map(ProjectProjection::getId)
+                .toList();
+
+        List<ProjectMemberProjection> projectMembers = projectMemberRepo.findMembersByProjectIds(projectIds);
+
+        Map<Long, List<String>> membersMap = projectMembers.stream()
+                .collect(Collectors.groupingBy(
+                        ProjectMemberProjection::getProjectId,
+                        Collectors.mapping(
+                                ProjectMemberProjection::getUsername,
+                                Collectors.toList())
                 ));
-            }
-            grouped.get(projectId).getMembers().add(flatDTO.getUsername());
-        }
 
-        return grouped;
+        List<ProjectResponseDTO> response = projectPage.getContent().stream()
+                .map(p -> new ProjectResponseDTO(
+                        p.getId(),
+                        p.getName(),
+                        p.getDescription(),
+                        p.getCreatedAt(),
+                        p.getCreatedBy(),
+                        membersMap.getOrDefault(p.getId(), new ArrayList<>())
+                ))
+                .toList();
+
+        return new PageResponseDTO<ProjectResponseDTO>(
+                response,
+                projectPage.getNumber(),
+                projectPage.getSize(),
+                projectPage.getTotalElements(),
+                projectPage.getTotalPages()
+        );
     }
 
     @Transactional

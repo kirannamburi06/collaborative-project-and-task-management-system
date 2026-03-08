@@ -1,12 +1,13 @@
 package com.kiran.collaborativeprojectandtaskmanagementsystem.controller;
 
-import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.CreateProjectRequestDTO;
-import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.InviteUserRequestDTO;
-import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.ProjectMemberResponseDTO;
-import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.ProjectResponseDTO;
+import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.*;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.model.Users;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.security.UserPrincipal;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.service.ProjectService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -34,10 +35,11 @@ public class ProjectController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getProjects(@AuthenticationPrincipal UserPrincipal userPrincipal){
+    public ResponseEntity<?> getProjects(@AuthenticationPrincipal UserPrincipal userPrincipal,
+                                         @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable){
         Users user = userPrincipal.getUser();
 
-        Map<Long, ProjectResponseDTO> projectList = projectService.getProjects(user);
+        PageResponseDTO<ProjectResponseDTO> projectList = projectService.getProjects(user, pageable);
 
         return ResponseEntity.status(200).body(projectList);
     }

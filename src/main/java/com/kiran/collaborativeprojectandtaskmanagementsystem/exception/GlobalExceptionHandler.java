@@ -36,6 +36,33 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(404).body(error);
     }
 
+    @ExceptionHandler(UserIsAlreadyAMemberException.class)
+    public ResponseEntity<ApiError> handeUserIsAlreadyAMemberException(UserIsAlreadyAMemberException e){
+        log.error(e.getMessage());
+
+        ApiError error = new ApiError(e.getMessage());
+
+        return ResponseEntity.status(409).body(error);
+    }
+
+    @ExceptionHandler(InsufficientPrivilegesException.class)
+    public ResponseEntity<ApiError> handleInsufficientPrivilegesException(InsufficientPrivilegesException e){
+        log.error(e.getMessage());
+
+        ApiError error = new ApiError(e.getMessage());
+
+        return ResponseEntity.status(403).body(error);
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ApiError> handleResourceNotFoundException(ResourceNotFoundException e){
+        log.error(e.getMessage());
+
+        ApiError error = new ApiError(e.getMessage());
+
+        return ResponseEntity.status(404).body(error);
+    }
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ApiError> handleRuntimeException(RuntimeException e){
         log.error(e.getMessage());

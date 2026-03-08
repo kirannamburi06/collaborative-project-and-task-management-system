@@ -1,7 +1,10 @@
 package com.kiran.collaborativeprojectandtaskmanagementsystem.service;
 
 import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.*;
+import com.kiran.collaborativeprojectandtaskmanagementsystem.exception.InsufficientPrivilegesException;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.exception.ProjectNotFoundException;
+import com.kiran.collaborativeprojectandtaskmanagementsystem.exception.ResourceNotFoundException;
+import com.kiran.collaborativeprojectandtaskmanagementsystem.exception.UserIsAlreadyAMemberException;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.model.*;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.repository.ProjectMemberRepo;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.repository.ProjectRepo;
@@ -111,10 +114,13 @@ public class ProjectService {
         ProjectMember pm = projectMemberRepo.findByProjectAndUser(project, invitedUser);
         if(pm != null){
             if(pm.getStatus() == InvitationStatus.ACTIVE) {
-                throw new RuntimeException("user is already a member in this project");
+                throw new UserIsAlreadyAMemberException("user is already a member in this project");
             } else if (pm.getStatus() == InvitationStatus.INVITED) {
                 pm.setRole(request.getRole());
                 projectMemberRepo.save(pm);
+            } else if (pm.getStatus() == InvitationStatus.REJECTED){
+                pm.setRole(request.getRole());
+                pm.setStatus(InvitationStatus.INVITED);
             }
         }else {
 
@@ -134,7 +140,7 @@ public class ProjectService {
         ProjectMember member = projectMemberRepo.findByProjectAndUser(project, user);
 
         if(member == null){
-            throw new RuntimeException("You are Not a member in this project, so you cannot invite users");
+            throw new InsufficientPrivilegesException("You are Not a member in this project, so you cannot invite users");
         }
 
         for(ProjectRole role : roles){
@@ -142,7 +148,7 @@ public class ProjectService {
                 return;
         }
 
-        throw new RuntimeException("You have no privileges to add new members into this project");
+        throw new InsufficientPrivilegesException("You have no privileges to add new members into this project");
     }
 
     @Transactional
@@ -155,15 +161,15 @@ public class ProjectService {
         ProjectMember member = projectMemberRepo.findByProjectAndUser(project, user);
 
         if(member == null){
-            throw new RuntimeException("Invitation not found");
+            throw new ResourceNotFoundException("Invitation not found");
         }
 
 
         if(member.getStatus() == InvitationStatus.ACTIVE){
-            throw new RuntimeException("You are already a active member!");
+            throw new UserIsAlreadyAMemberException("You are already a active member!");
         }
         else if(member.getStatus() != InvitationStatus.INVITED){
-            throw new RuntimeException("You are not invited, so you cannot accept or join!");
+            throw new InsufficientPrivilegesException("You are not invited, so you cannot accept or join!");
         }
 
         member.setStatus(InvitationStatus.ACTIVE);
@@ -175,7 +181,7 @@ public class ProjectService {
         List<ProjectMemberResponseDTO> invitations =  projectMemberRepo.findAllInvitationsDTO(user, InvitationStatus.INVITED);
 
         if(invitations == null){
-            throw new RuntimeException("No invitations");
+            throw new ResourceNotFoundException("No invitations");
         }
 
         return invitations;
@@ -191,11 +197,11 @@ public class ProjectService {
         ProjectMember member = projectMemberRepo.findByProjectAndUser(project, user);
 
         if(member == null){
-            throw new RuntimeException("Invitation not found");
+            throw new ResourceNotFoundException("Invitation not found");
         }
 
         if(member.getStatus() == InvitationStatus.ACTIVE || member.getStatus() == InvitationStatus.REJECTED){
-            throw new RuntimeException("Failed to reject. You are either an active member or you already rejected");
+            throw new UserIsAlreadyAMemberException("Failed to reject. You are either an active member or you already rejected");
         }
 
         member.setStatus(InvitationStatus.REJECTED);
@@ -212,11 +218,11 @@ public class ProjectService {
         ProjectMember member = projectMemberRepo.findByProjectAndUser(project, user);
 
         if(member == null || member.getStatus() != InvitationStatus.ACTIVE){
-            throw new RuntimeException("You are not an active member in this project");
+            throw new InsufficientPrivilegesException("You are not an active member in this project");
         }
 
         if(!project.getCreatedBy().getId().equals(user.getId())){
-            throw new RuntimeException("Only owner can delete project");
+            throw new InsufficientPrivilegesException("Only owner can delete project");
         }
 
         projectRepo.delete(project);

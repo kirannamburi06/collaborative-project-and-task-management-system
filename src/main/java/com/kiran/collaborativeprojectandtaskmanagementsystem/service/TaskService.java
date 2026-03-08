@@ -1,7 +1,9 @@
 package com.kiran.collaborativeprojectandtaskmanagementsystem.service;
 
 import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.*;
+import com.kiran.collaborativeprojectandtaskmanagementsystem.exception.InsufficientPrivilegesException;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.exception.ProjectNotFoundException;
+import com.kiran.collaborativeprojectandtaskmanagementsystem.exception.ResourceNotFoundException;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.exception.UserNotFoundException;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.model.*;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.repository.ProjectMemberRepo;
@@ -31,7 +33,7 @@ public class TaskService {
 
         ProjectMember member = projectMemberRepo.findByProjectAndUser(project, user);
         if(member == null || member.getStatus() != InvitationStatus.ACTIVE){
-            throw new RuntimeException("You are not a member in this project");
+            throw new InsufficientPrivilegesException("You are not a member in this project");
         }
 
         Task task = taskMapper.toEntity(taskRequestDTO, project, user);
@@ -43,7 +45,7 @@ public class TaskService {
 
             ProjectMember assignedMember = projectMemberRepo.findByProjectAndUser(project, assignedUser);
             if(assignedMember == null || assignedMember.getStatus() != InvitationStatus.ACTIVE){
-                throw new RuntimeException("Assigned user is not a member in this project");
+                throw new InsufficientPrivilegesException("Assigned user is not a member in this project");
             }
 
             task.setAssignedUser(assignedUser);
@@ -63,7 +65,7 @@ public class TaskService {
 
         ProjectMember member = projectMemberRepo.findByProjectAndUser(project, user);
         if(member == null || member.getStatus() != InvitationStatus.ACTIVE){
-            throw new RuntimeException("You are not a member in this project");
+            throw new InsufficientPrivilegesException("You are not a member in this project");
         }
 
         Page<TaskResponseDTO> response = taskRepo.getAllTasks(
@@ -88,18 +90,18 @@ public class TaskService {
                 .orElseThrow(() -> new ProjectNotFoundException("Project with id: " + projectId + " not found"));
 
         Task task = taskRepo.findById(taskId)
-                .orElseThrow(() -> new RuntimeException("Task with id: " + taskId + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Task with id: " + taskId + " not found"));
 
         if (!task.getProject().getId().equals(projectId)) {
-            throw new RuntimeException("Task does not belong to this project");
+            throw new ResourceNotFoundException("Task does not belong to this project");
         }
 
         ProjectMember member = projectMemberRepo.findByProjectAndUser(project, user);
         if(member == null || member.getStatus() != InvitationStatus.ACTIVE) {
-            throw new RuntimeException("You are not a member in this project");
+            throw new InsufficientPrivilegesException("You are not a member in this project");
         }
         if(member.getRole() != ProjectRole.OWNER && member.getRole() != ProjectRole.ADMIN && task.getCreatedBy() != user){
-            throw new RuntimeException("Insufficient privileges");
+            throw new InsufficientPrivilegesException("Insufficient privileges");
         }
 
         Long assignUserId = assignUserRequest.getAssignUserId();
@@ -109,7 +111,7 @@ public class TaskService {
 
         ProjectMember assignedMember = projectMemberRepo.findByProjectAndUser(project, assignedUser);
         if(assignedMember == null || assignedMember.getStatus() != InvitationStatus.ACTIVE){
-            throw new RuntimeException("Assign user is not a member in this project");
+            throw new InsufficientPrivilegesException("Assign user is not a member in this project");
         }
 
         task.setAssignedUser(assignedUser);
@@ -123,18 +125,18 @@ public class TaskService {
                 .orElseThrow(() -> new ProjectNotFoundException("Project with id: " + projectId + " not found"));
 
         Task task = taskRepo.findById(taskId)
-                .orElseThrow(() -> new RuntimeException("Task with id: " + taskId + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Task with id: " + taskId + " not found"));
 
         if (!task.getProject().getId().equals(projectId)) {
-            throw new RuntimeException("Task does not belong to this project");
+            throw new ResourceNotFoundException("Task does not belong to this project");
         }
 
         ProjectMember member = projectMemberRepo.findByProjectAndUser(project, user);
         if(member == null || member.getStatus() != InvitationStatus.ACTIVE) {
-            throw new RuntimeException("You are not a member in this project");
+            throw new InsufficientPrivilegesException("You are not a member in this project");
         }
         if(member.getRole() != ProjectRole.OWNER && member.getRole() != ProjectRole.ADMIN && task.getCreatedBy() != user){
-            throw new RuntimeException("Insufficient privileges");
+            throw new InsufficientPrivilegesException("Insufficient privileges");
         }
 
         task.setStatus(status);
@@ -148,18 +150,18 @@ public class TaskService {
                 .orElseThrow(() -> new ProjectNotFoundException("Project with id: " + projectId + " not found"));
 
         Task task = taskRepo.findById(taskId)
-                .orElseThrow(() -> new RuntimeException("Task with id: " + taskId + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Task with id: " + taskId + " not found"));
 
         if (!task.getProject().getId().equals(projectId)) {
-            throw new RuntimeException("Task does not belong to this project");
+            throw new ResourceNotFoundException("Task does not belong to this project");
         }
 
         ProjectMember member = projectMemberRepo.findByProjectAndUser(project, user);
         if(member == null || member.getStatus() != InvitationStatus.ACTIVE) {
-            throw new RuntimeException("You are not a member in this project");
+            throw new InsufficientPrivilegesException("You are not a member in this project");
         }
         if(member.getRole() != ProjectRole.OWNER && member.getRole() != ProjectRole.ADMIN && task.getCreatedBy() != user){
-            throw new RuntimeException("Insufficient privileges");
+            throw new InsufficientPrivilegesException("Insufficient privileges");
         }
 
         taskRepo.delete(task);

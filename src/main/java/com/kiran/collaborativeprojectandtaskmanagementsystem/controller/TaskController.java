@@ -43,11 +43,19 @@ public class TaskController {
     @GetMapping("/{projectId}/tasks")
     public ResponseEntity<?> getAllTasks(@PathVariable Long projectId,
                                          @AuthenticationPrincipal UserPrincipal userPrincipal,
+                                         @RequestParam(required = false) TaskStatus status,
+                                         @RequestParam(required = false) Long assignedTo,
                                          @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
                                              Pageable pageable){
         Users user = userPrincipal.getUser();
 
-        PageResponseDTO<TaskResponseDTO> tasks = taskService.getAllTasks(user, projectId, pageable);
+        PageResponseDTO<TaskResponseDTO> tasks = taskService.getAllTasks(
+                user,
+                projectId,
+                status,
+                assignedTo,
+                pageable
+                );
 
         return ResponseEntity.status(200).body(tasks);
     }

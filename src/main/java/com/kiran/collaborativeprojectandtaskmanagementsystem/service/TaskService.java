@@ -14,8 +14,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class TaskService {
@@ -56,6 +54,8 @@ public class TaskService {
 
     public PageResponseDTO<TaskResponseDTO> getAllTasks(Users user,
                                                         Long projectId,
+                                                        TaskStatus status,
+                                                        Long assignedTo,
                                                         Pageable pageable) {
 
         Project project = projectRepo.findById(projectId)
@@ -66,7 +66,11 @@ public class TaskService {
             throw new RuntimeException("You are not a member in this project");
         }
 
-        Page<TaskResponseDTO> response = taskRepo.getAllTasks(projectId, pageable);
+        Page<TaskResponseDTO> response = taskRepo.getAllTasks(
+                projectId,
+                status,
+                assignedTo,
+                pageable);
 
         return new PageResponseDTO<TaskResponseDTO>(
                 response.getContent(),

@@ -29,6 +29,7 @@ public class ProjectService {
     private final ProjectMemberRepo projectMemberRepo;
     private final UserRepo userRepo;
     private final ProjectMemberMapper projectMemberMapper;
+    private final ActivityLogService activityLogService;
 
     @Transactional
     public void createProject(CreateProjectRequestDTO requestDTO, Users user){
@@ -44,6 +45,13 @@ public class ProjectService {
         owner.setJoinedAt(LocalDateTime.now());
         projectMemberRepo.save(owner);
 
+        activityLogService.log(
+                ActivityType.PROJECT_CREATED,
+                user,
+                project,
+                EntityType.PROJECT,
+                project.getId()
+        );
     }
 
     public PageResponseDTO<ProjectResponseDTO> getProjects(Users user,
@@ -133,6 +141,14 @@ public class ProjectService {
 
             projectMemberRepo.save(member);
         }
+
+        activityLogService.log(
+                ActivityType.USER_INVITED,
+                user,
+                project,
+                EntityType.PROJECT,
+                project.getId()
+        );
     }
 
     private void validateRole(Project project, Users user, ProjectRole... roles) {
@@ -174,6 +190,14 @@ public class ProjectService {
 
         member.setStatus(InvitationStatus.ACTIVE);
         member.setJoinedAt(LocalDateTime.now());
+
+        activityLogService.log(
+                ActivityType.USER_ACCEPTED,
+                user,
+                project,
+                EntityType.PROJECT,
+                project.getId()
+        );
     }
 
     public List<ProjectMemberResponseDTO> getAllInvitations(Users user){
@@ -206,6 +230,13 @@ public class ProjectService {
 
         member.setStatus(InvitationStatus.REJECTED);
 
+        activityLogService.log(
+                ActivityType.USER_REJECTED,
+                user,
+                project,
+                EntityType.PROJECT,
+                project.getId()
+        );
     }
 
     @Transactional
@@ -226,5 +257,13 @@ public class ProjectService {
         }
 
         projectRepo.delete(project);
+
+        activityLogService.log(
+                ActivityType.PROJECT_DELETED,
+                user,
+                project,
+                EntityType.PROJECT,
+                project.getId()
+        );
     }
 }

@@ -25,7 +25,9 @@ public class TaskService {
     private final ProjectRepo projectRepo;
     private final TaskMapper taskMapper;
     private final UserRepo userRepo;
+    private final ActivityLogService activityLogService;
 
+    @Transactional
     public void createTask(CreateTaskRequestDTO taskRequestDTO, Long projectId, Users user) {
 
         Project project = projectRepo.findById(projectId)
@@ -52,6 +54,14 @@ public class TaskService {
         }
 
         taskRepo.save(task);
+
+        activityLogService.log(
+                ActivityType.TASK_CREATED,
+                user,
+                project,
+                EntityType.TASK,
+                task.getId()
+                );
     }
 
     public PageResponseDTO<TaskResponseDTO> getAllTasks(Users user,
@@ -116,6 +126,13 @@ public class TaskService {
 
         task.setAssignedUser(assignedUser);
 
+        activityLogService.log(
+                ActivityType.TASK_ASSIGNED,
+                user,
+                project,
+                EntityType.TASK,
+                task.getId()
+        );
     }
 
     @Transactional
@@ -141,6 +158,13 @@ public class TaskService {
 
         task.setStatus(status);
 
+        activityLogService.log(
+                ActivityType.TASK_STATUS_UPDATED,
+                user,
+                project,
+                EntityType.TASK,
+                task.getId()
+        );
     }
 
     @Transactional
@@ -166,5 +190,12 @@ public class TaskService {
 
         taskRepo.delete(task);
 
+        activityLogService.log(
+                ActivityType.TASK_DELETED,
+                user,
+                project,
+                EntityType.TASK,
+                task.getId()
+        );
     }
 }

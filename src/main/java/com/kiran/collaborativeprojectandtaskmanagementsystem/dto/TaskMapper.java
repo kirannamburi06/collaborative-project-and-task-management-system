@@ -20,4 +20,19 @@ public class TaskMapper {
         return task;
     }
 
+    public TaskResponseDTO toDTO(Task task){
+        TaskResponseDTO dto = new TaskResponseDTO();
+
+        dto.setId(task.getId());
+        dto.setName(task.getName());
+        dto.setDescription(task.getDescription());
+        dto.setStatus(task.getStatus());
+        dto.setCreatedBy(task.getCreatedBy().getUsername());
+        dto.setCreatedAt(task.getCreatedAt());
+        dto.setAssignedUser(task.getAssignedUser() == null ? null : task.getAssignedUser().getUsername());
+        dto.setUpdatedAt(task.getUpdatedAt());
+
+        return dto;
+    }
+
 }

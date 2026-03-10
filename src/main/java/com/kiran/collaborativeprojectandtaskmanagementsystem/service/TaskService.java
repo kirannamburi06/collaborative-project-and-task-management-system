@@ -28,7 +28,7 @@ public class TaskService {
     private final ActivityLogService activityLogService;
 
     @Transactional
-    public void createTask(CreateTaskRequestDTO taskRequestDTO, Long projectId, Users user) {
+    public TaskResponseDTO createTask(CreateTaskRequestDTO taskRequestDTO, Long projectId, Users user) {
 
         Project project = projectRepo.findById(projectId)
                 .orElseThrow(() -> new ProjectNotFoundException("Project with id: " + projectId + " not found"));
@@ -62,6 +62,8 @@ public class TaskService {
                 EntityType.TASK,
                 task.getId()
                 );
+
+        return taskMapper.toDTO(task);
     }
 
     public PageResponseDTO<TaskResponseDTO> getAllTasks(Users user,
@@ -94,7 +96,7 @@ public class TaskService {
     }
 
     @Transactional
-    public void assignUserToTask(Long projectId, Long taskId, AssignUserRequest assignUserRequest, Users user) {
+    public TaskResponseDTO assignUserToTask(Long projectId, Long taskId, AssignUserRequest assignUserRequest, Users user) {
 
         Project project = projectRepo.findById(projectId)
                 .orElseThrow(() -> new ProjectNotFoundException("Project with id: " + projectId + " not found"));
@@ -133,10 +135,12 @@ public class TaskService {
                 EntityType.TASK,
                 task.getId()
         );
+
+        return taskMapper.toDTO(task);
     }
 
     @Transactional
-    public void updateTaskStatus(Long projectId, Long taskId, TaskStatus status, Users user){
+    public TaskResponseDTO updateTaskStatus(Long projectId, Long taskId, TaskStatus status, Users user){
 
         Project project = projectRepo.findById(projectId)
                 .orElseThrow(() -> new ProjectNotFoundException("Project with id: " + projectId + " not found"));
@@ -165,10 +169,12 @@ public class TaskService {
                 EntityType.TASK,
                 task.getId()
         );
+
+        return taskMapper.toDTO(task);
     }
 
     @Transactional
-    public void deleteTask(Long projectId, Long taskId, Users user) {
+    public TaskResponseDTO deleteTask(Long projectId, Long taskId, Users user) {
 
         Project project = projectRepo.findById(projectId)
                 .orElseThrow(() -> new ProjectNotFoundException("Project with id: " + projectId + " not found"));
@@ -197,5 +203,7 @@ public class TaskService {
                 EntityType.TASK,
                 task.getId()
         );
+
+        return taskMapper.toDTO(task);
     }
 }

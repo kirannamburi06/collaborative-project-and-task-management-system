@@ -1,9 +1,6 @@
 package com.kiran.collaborativeprojectandtaskmanagementsystem.controller;
 
-import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.AssignUserRequest;
-import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.CreateTaskRequestDTO;
-import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.PageResponseDTO;
-import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.TaskResponseDTO;
+import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.*;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.model.TaskStatus;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.model.Users;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.security.UserPrincipal;
@@ -29,19 +26,25 @@ public class TaskController {
     private final TaskService taskService;
 
     @PostMapping("/{projectId}/tasks")
-    public ResponseEntity<?> createTask(@RequestBody CreateTaskRequestDTO taskRequestDTO,
+    public ResponseEntity<ApiResponse<TaskResponseDTO>> createTask(@RequestBody CreateTaskRequestDTO taskRequestDTO,
                                         @PathVariable Long projectId,
                                         @AuthenticationPrincipal UserPrincipal userPrincipal){
 
         Users user = userPrincipal.getUser();
-        taskService.createTask(taskRequestDTO, projectId, user);
+        TaskResponseDTO taskResponse = taskService.createTask(taskRequestDTO, projectId, user);
 
-        return ResponseEntity.status(200).body("Task created successfully!");
+        ApiResponse<TaskResponseDTO> response = new ApiResponse<>(
+                true,
+                "Task created successfully!",
+                taskResponse
+        );
+
+        return ResponseEntity.status(200).body(response);
 
     }
 
     @GetMapping("/{projectId}/tasks")
-    public ResponseEntity<?> getAllTasks(@PathVariable Long projectId,
+    public ResponseEntity<ApiResponse<PageResponseDTO<TaskResponseDTO>>> getAllTasks(@PathVariable Long projectId,
                                          @AuthenticationPrincipal UserPrincipal userPrincipal,
                                          @RequestParam(required = false) TaskStatus status,
                                          @RequestParam(required = false) Long assignedTo,
@@ -57,23 +60,35 @@ public class TaskController {
                 pageable
                 );
 
-        return ResponseEntity.status(200).body(tasks);
+        ApiResponse<PageResponseDTO<TaskResponseDTO>> response = new ApiResponse<>(
+                true,
+                "Fetch tasks successful",
+                tasks
+        );
+
+        return ResponseEntity.status(200).body(response);
     }
 
     @PostMapping("/{projectId}/tasks/{taskId}/assign")
-    public ResponseEntity<?> assignUserToTask(@PathVariable Long projectId,
+    public ResponseEntity<ApiResponse<TaskResponseDTO>> assignUserToTask(@PathVariable Long projectId,
                                               @PathVariable Long taskId,
                                               @RequestBody AssignUserRequest assignUserRequest,
                                               @AuthenticationPrincipal UserPrincipal userPrincipal){
         Users user = userPrincipal.getUser();
 
-        taskService.assignUserToTask(projectId, taskId, assignUserRequest, user);
+        TaskResponseDTO taskResponse = taskService.assignUserToTask(projectId, taskId, assignUserRequest, user);
 
-        return ResponseEntity.status(200).body("User successfully assigned to task");
+        ApiResponse<TaskResponseDTO> response = new ApiResponse<>(
+                true,
+                "User successfully assigned to task",
+                taskResponse
+        );
+
+        return ResponseEntity.status(200).body(response);
     }
 
     @PatchMapping("/{projectId}/tasks/{taskId}/update")
-    public ResponseEntity<?> updateTaskStatus(@PathVariable Long projectId,
+    public ResponseEntity<ApiResponse<TaskResponseDTO>> updateTaskStatus(@PathVariable Long projectId,
                                               @PathVariable Long taskId,
                                               @RequestParam(required = false) TaskStatus status,
                                               @AuthenticationPrincipal UserPrincipal userPrincipal){
@@ -83,22 +98,34 @@ public class TaskController {
 
         Users user = userPrincipal.getUser();
 
-        taskService.updateTaskStatus(projectId, taskId, status, user);
+        TaskResponseDTO taskResponse = taskService.updateTaskStatus(projectId, taskId, status, user);
 
-        return ResponseEntity.status(200).body("Updated the status successfully");
+        ApiResponse<TaskResponseDTO> response = new ApiResponse<>(
+                true,
+                "Updated the status successfully",
+                taskResponse
+        );
+
+        return ResponseEntity.status(200).body(response);
 
     }
 
     @DeleteMapping("/{projectId}/tasks/{taskId}")
-    public ResponseEntity<?> deleteTask(@PathVariable Long projectId,
+    public ResponseEntity<ApiResponse<TaskResponseDTO>> deleteTask(@PathVariable Long projectId,
                                         @PathVariable Long taskId,
                                         @AuthenticationPrincipal UserPrincipal userPrincipal){
 
         Users user = userPrincipal.getUser();
 
-        taskService.deleteTask(projectId, taskId, user);
+        TaskResponseDTO taskResponse = taskService.deleteTask(projectId, taskId, user);
 
-        return ResponseEntity.status(200).body("Deleted the task successfully");
+        ApiResponse<TaskResponseDTO> response = new ApiResponse<>(
+                true,
+                "Deleted the task successfully",
+                taskResponse
+        );
+
+        return ResponseEntity.status(200).body(response);
 
     }
 }

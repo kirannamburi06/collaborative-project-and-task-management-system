@@ -32,7 +32,7 @@ public class ProjectService {
     private final ActivityLogService activityLogService;
 
     @Transactional
-    public void createProject(CreateProjectRequestDTO requestDTO, Users user){
+    public ProjectResponseDTO createProject(CreateProjectRequestDTO requestDTO, Users user){
 
         Project project = projectMapper.toEntity(requestDTO, user);
         projectRepo.save(project);
@@ -43,6 +43,9 @@ public class ProjectService {
         owner.setRole(ProjectRole.OWNER);
         owner.setStatus(InvitationStatus.ACTIVE);
         owner.setJoinedAt(LocalDateTime.now());
+
+        project.getMembers().add(owner);
+
         projectMemberRepo.save(owner);
 
         activityLogService.log(
@@ -52,6 +55,8 @@ public class ProjectService {
                 EntityType.PROJECT,
                 project.getId()
         );
+
+        return projectMapper.toDTO(project);
     }
 
     public PageResponseDTO<ProjectResponseDTO> getProjects(Users user,
@@ -104,7 +109,7 @@ public class ProjectService {
     }
 
     @Transactional
-    public void inviteUserToProject(InviteUserRequestDTO request, Users user, Long id) {
+    public ProjectResponseDTO inviteUserToProject(InviteUserRequestDTO request, Users user, Long id) {
 
         Project project = projectRepo.findById(id)
                 .orElseThrow(() -> new ProjectNotFoundException(
@@ -149,6 +154,8 @@ public class ProjectService {
                 EntityType.PROJECT,
                 project.getId()
         );
+
+        return null;
     }
 
     private void validateRole(Project project, Users user, ProjectRole... roles) {
@@ -168,7 +175,7 @@ public class ProjectService {
     }
 
     @Transactional
-    public void acceptInvite(Users user, Long id) {
+    public ProjectResponseDTO acceptInvite(Users user, Long id) {
 
         Project project = projectRepo.findById(id).orElseThrow(
                 () -> new ProjectNotFoundException("Project with id : " + id + " not found")
@@ -198,6 +205,8 @@ public class ProjectService {
                 EntityType.PROJECT,
                 project.getId()
         );
+
+        return null;
     }
 
     public List<ProjectMemberResponseDTO> getAllInvitations(Users user){
@@ -212,7 +221,7 @@ public class ProjectService {
     }
 
     @Transactional
-    public void rejectInvite(Users user, Long id) {
+    public ProjectResponseDTO rejectInvite(Users user, Long id) {
 
         Project project = projectRepo.findById(id).orElseThrow(
                 () -> new ProjectNotFoundException("Project with id : " + id + " not found")
@@ -237,10 +246,12 @@ public class ProjectService {
                 EntityType.PROJECT,
                 project.getId()
         );
+
+        return null;
     }
 
     @Transactional
-    public void deleteProject(Long projectId, Users user) {
+    public ProjectResponseDTO deleteProject(Long projectId, Users user) {
 
         Project project = projectRepo.findById(projectId).orElseThrow(
                 () -> new ProjectNotFoundException("Project with id : " + projectId + " not found")
@@ -265,5 +276,7 @@ public class ProjectService {
                 EntityType.PROJECT,
                 project.getId()
         );
+
+        return projectMapper.toDTO(project);
     }
 }

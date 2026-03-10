@@ -2,6 +2,7 @@ package com.kiran.collaborativeprojectandtaskmanagementsystem.controller;
 
 import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.*;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.model.InvitationStatus;
+import com.kiran.collaborativeprojectandtaskmanagementsystem.model.Project;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.model.ProjectRole;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.model.Users;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.security.UserPrincipal;
@@ -28,16 +29,23 @@ public class ProjectController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createProject(@RequestBody CreateProjectRequestDTO project,
-                                           @AuthenticationPrincipal UserPrincipal userPrincipal){
+    public ResponseEntity<ApiResponse<ProjectResponseDTO>> createProject(@RequestBody CreateProjectRequestDTO project,
+                                                              @AuthenticationPrincipal UserPrincipal userPrincipal){
 
         Users user = userPrincipal.getUser();
-        projectService.createProject(project, user);
-        return ResponseEntity.status(200).body("Project Created");
+        ProjectResponseDTO projectResponse = projectService.createProject(project, user);
+
+        ApiResponse<ProjectResponseDTO> response = new ApiResponse<>(
+                true,
+                "Project created",
+                projectResponse
+        );
+
+        return ResponseEntity.status(200).body(response);
     }
 
     @GetMapping
-    public ResponseEntity<?> getProjects(@AuthenticationPrincipal UserPrincipal userPrincipal,
+    public ResponseEntity<ApiResponse<PageResponseDTO<ProjectResponseDTO>>> getProjects(@AuthenticationPrincipal UserPrincipal userPrincipal,
                                          @RequestParam(required = false) InvitationStatus status,
                                          @RequestParam(required = false) ProjectRole role,
                                          @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
@@ -50,55 +58,91 @@ public class ProjectController {
                 role,
                 pageable);
 
-        return ResponseEntity.status(200).body(projectList);
+        ApiResponse<PageResponseDTO<ProjectResponseDTO>> response = new ApiResponse<>(
+                true,
+                "Fetch all projects success",
+                projectList
+        );
+
+        return ResponseEntity.status(200).body(response);
     }
 
     @PostMapping("/{id}/invite")
-    public ResponseEntity<?> inviteUserToProject(@RequestBody InviteUserRequestDTO request,
+    public ResponseEntity<ApiResponse<ProjectResponseDTO>> inviteUserToProject(@RequestBody InviteUserRequestDTO request,
                                                  @AuthenticationPrincipal UserPrincipal userPrincipal,
                                                  @PathVariable Long id){
         Users user = userPrincipal.getUser();
-        projectService.inviteUserToProject(request, user, id);
+        ProjectResponseDTO projectResponse = projectService.inviteUserToProject(request, user, id);
 
-        return ResponseEntity.status(200).body("Invite request sent");
+        ApiResponse<ProjectResponseDTO> response = new ApiResponse<ProjectResponseDTO>(
+                true,
+                "User invited successfully",
+                null
+        );
+
+        return ResponseEntity.status(200).body(response);
     }
 
     @PostMapping("/{id}/accept")
-    public ResponseEntity<?> acceptInvite(@AuthenticationPrincipal UserPrincipal userPrincipal,
+    public ResponseEntity<ApiResponse<ProjectResponseDTO>> acceptInvite(@AuthenticationPrincipal UserPrincipal userPrincipal,
                                           @PathVariable Long id){
         Users user = userPrincipal.getUser();
-        projectService.acceptInvite(user, id);
+        ProjectResponseDTO projectResponse = projectService.acceptInvite(user, id);
 
-        return ResponseEntity.status(200).body("Invitation accepted");
+        ApiResponse<ProjectResponseDTO> response = new ApiResponse<ProjectResponseDTO>(
+                true,
+                "Invitation accepted successfully",
+                null
+        );
+
+        return ResponseEntity.status(200).body(response);
     }
 
     @GetMapping("/invitations")
-    public ResponseEntity<?> getInvitations(@AuthenticationPrincipal UserPrincipal userPrincipal){
+    public ResponseEntity<ApiResponse<List<ProjectMemberResponseDTO>>> getInvitations(@AuthenticationPrincipal UserPrincipal userPrincipal){
 
         Users user = userPrincipal.getUser();
         List<ProjectMemberResponseDTO> invitations = projectService.getAllInvitations(user);
 
-        return ResponseEntity.status(200).body(invitations);
+        ApiResponse<List<ProjectMemberResponseDTO>> response = new ApiResponse<>(
+                true,
+                "Fetch all invitations successful",
+                invitations
+        );
+
+        return ResponseEntity.status(200).body(response);
 
     }
 
     @PostMapping("/{id}/reject")
-    public ResponseEntity<?> rejectInvite(@AuthenticationPrincipal UserPrincipal userPrincipal,
+    public ResponseEntity<ApiResponse<ProjectResponseDTO>> rejectInvite(@AuthenticationPrincipal UserPrincipal userPrincipal,
                                           @PathVariable Long id){
         Users user = userPrincipal.getUser();
-        projectService.rejectInvite(user, id);
+        ProjectResponseDTO projectResponse = projectService.rejectInvite(user, id);
 
-        return ResponseEntity.status(200).body("Rejected invitation");
+        ApiResponse<ProjectResponseDTO> response = new ApiResponse<>(
+                true,
+                "Rejected invitation successfully",
+                projectResponse
+        );
+
+        return ResponseEntity.status(200).body(response);
     }
 
     @DeleteMapping("/{projectId}")
-    public ResponseEntity<?> deleteProject(@PathVariable Long projectId,
+    public ResponseEntity<ApiResponse<ProjectResponseDTO>> deleteProject(@PathVariable Long projectId,
                                            @AuthenticationPrincipal UserPrincipal userPrincipal){
 
         Users user = userPrincipal.getUser();
 
-        projectService.deleteProject(projectId, user);
+        ProjectResponseDTO projectResponse = projectService.deleteProject(projectId, user);
 
-        return ResponseEntity.status(200).body("Project deleted successfully");
+        ApiResponse<ProjectResponseDTO> response = new ApiResponse<>(
+                true,
+                "Project deleted successfully",
+                projectResponse
+        );
+
+        return ResponseEntity.status(200).body(response);
     }
 }

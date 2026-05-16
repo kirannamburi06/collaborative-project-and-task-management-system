@@ -29,6 +29,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, JwtFilter jwtFilter){
         return httpSecurity.csrf(customizer -> customizer.disable())
+                .cors(cors -> {})
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/api/auth/register",
                                 "/api/auth/login")

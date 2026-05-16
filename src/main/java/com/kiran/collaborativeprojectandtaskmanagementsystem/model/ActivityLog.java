@@ -24,8 +24,7 @@ public class ActivityLog {
     @ManyToOne(fetch = FetchType.LAZY)
     private Users performedBy;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Project project;
+    private String projectName;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

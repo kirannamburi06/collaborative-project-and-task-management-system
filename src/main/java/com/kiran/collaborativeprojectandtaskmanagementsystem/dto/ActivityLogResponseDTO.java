@@ -18,7 +18,7 @@ public class ActivityLogResponseDTO {
 
     private ActivityType activityType;
     private String performedBy;
-    private Long projectId;
+    private String projectName;
     private EntityType entityType;
     private Long entityId;
 

@@ -3,9 +3,9 @@ spring:
     name: CollaborativeProjectAndTaskManagementSystem
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/project_management_system
-    username: postgres
-    password: postgres
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
 
   jpa:
     hibernate:
@@ -13,6 +13,9 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+  profiles:
+    active: prod
 
 logging:
   level:

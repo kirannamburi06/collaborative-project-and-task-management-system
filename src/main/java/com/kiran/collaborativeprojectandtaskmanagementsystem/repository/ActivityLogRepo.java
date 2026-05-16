@@ -13,13 +13,13 @@ public interface ActivityLogRepo extends JpaRepository<ActivityLog, Long> {
         select new com.kiran.collaborativeprojectandtaskmanagementsystem.dto.ActivityLogResponseDTO(
             al.activityType,
             al.performedBy.username,
-            al.project.id,
+            al.projectName,
             al.entityType,
             al.entityId,
             al.createdAt
         )
         from ActivityLog al
-        where al.project.id = :projectId
+        where al.entityId = :projectId
 """)
     Page<ActivityLogResponseDTO> getActivityLogs(Long projectId, Pageable pageable);
 }

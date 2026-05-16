@@ -30,7 +30,7 @@ public class ActivityLogService {
         ActivityLog activityLog = new ActivityLog();
 
         activityLog.setActivityType(activityType);
-        activityLog.setProject(project);
+        activityLog.setProjectName(project.getName());
         activityLog.setPerformedBy(performedBy);
         activityLog.setEntityType(entityType);
         activityLog.setEntityId(entityId);

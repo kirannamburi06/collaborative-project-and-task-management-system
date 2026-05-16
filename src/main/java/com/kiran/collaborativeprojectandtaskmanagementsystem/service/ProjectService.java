@@ -267,8 +267,6 @@ public class ProjectService {
             throw new InsufficientPrivilegesException("Only owner can delete project");
         }
 
-        projectRepo.delete(project);
-
         activityLogService.log(
                 ActivityType.PROJECT_DELETED,
                 user,
@@ -276,6 +274,8 @@ public class ProjectService {
                 EntityType.PROJECT,
                 project.getId()
         );
+
+        projectRepo.delete(project);
 
         return projectMapper.toDTO(project);
     }

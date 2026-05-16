@@ -62,7 +62,7 @@ This project was designed with a strong focus on backend engineering principles 
 - Maven
 
 ### Database
-- MySQL
+- PostgreSQL
 
 ### Caching
 - Redis (In progress)

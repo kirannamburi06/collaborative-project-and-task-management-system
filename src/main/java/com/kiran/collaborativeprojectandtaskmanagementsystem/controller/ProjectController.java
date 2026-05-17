@@ -67,6 +67,22 @@ public class ProjectController {
         return ResponseEntity.status(200).body(response);
     }
 
+    @GetMapping("/{projectId}")
+    public ResponseEntity<ApiResponse<ProjectResponseDTO>> getProjectById(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @PathVariable Long projectId
+    ){
+        Users user = userPrincipal.getUser();
+        ProjectResponseDTO projectResponse = projectService.getProjectById(user, projectId);
+        ApiResponse<ProjectResponseDTO> response = new ApiResponse<>(
+                true,
+                "Fetch project with id: " + projectId + " successful",
+                projectResponse
+        );
+
+        return ResponseEntity.status(200).body(response);
+    }
+
     @PostMapping("/{id}/invite")
     public ResponseEntity<ApiResponse<ProjectResponseDTO>> inviteUserToProject(@RequestBody InviteUserRequestDTO request,
                                                  @AuthenticationPrincipal UserPrincipal userPrincipal,

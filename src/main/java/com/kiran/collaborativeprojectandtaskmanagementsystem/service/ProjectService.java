@@ -109,6 +109,30 @@ public class ProjectService {
     }
 
     @Transactional
+    public ProjectResponseDTO getProjectById(Users user, Long projectId) {
+
+        ProjectProjection projectProjection = projectMemberRepo.findProjectWithId(user, projectId);
+
+        if(projectProjection == null){
+            throw new ProjectNotFoundException("Project does not exist or you are not a member");
+        }
+
+        List<ProjectMemberProjection> members = projectMemberRepo.findMembersByProjectIds(new ArrayList<>(Collections.singletonList(projectId)));
+        List<String> memberList = members.stream()
+                .map(ProjectMemberProjection::getUsername)
+                .toList();
+
+        return new ProjectResponseDTO(
+                projectProjection.getId(),
+                projectProjection.getName(),
+                projectProjection.getDescription(),
+                projectProjection.getCreatedAt(),
+                projectProjection.getCreatedBy(),
+                memberList
+        );
+    }
+
+    @Transactional
     public ProjectResponseDTO inviteUserToProject(InviteUserRequestDTO request, Users user, Long id) {
 
         Project project = projectRepo.findById(id)

@@ -49,6 +49,21 @@ public interface ProjectMemberRepo extends JpaRepository<ProjectMember, Long> {
                                                 @Param("status") InvitationStatus status,
                                                 @Param("role") ProjectRole role,
                                                 Pageable pageable);
+
+    @Query("""
+        select p.id as id,
+                p.name as name,
+                p.description as description,
+                p.createdAt as createdAt,
+                p.createdBy.username as createdBy
+        from ProjectMember pm
+        join pm.project p
+        where pm.user = :user
+        and p.id = :projectId
+""")
+    ProjectProjection findProjectWithId(@Param("user") Users user,
+                                        @Param("projectId") Long projectId);
+
     @Query("""
         select pm.project.id as projectId,
                 pm.user.username as username

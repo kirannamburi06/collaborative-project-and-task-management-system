@@ -3,11 +3,9 @@ package com.kiran.collaborativeprojectandtaskmanagementsystem.controller;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.dto.ApiResponse;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.model.Users;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.service.AuthService;
+import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")

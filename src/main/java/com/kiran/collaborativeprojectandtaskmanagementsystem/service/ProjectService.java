@@ -303,4 +303,27 @@ public class ProjectService {
 
         return projectMapper.toDTO(project);
     }
+
+    public Long getIdByUsername(String username, Long projectId, Users user) {
+
+        Project project = projectRepo.findById(projectId).orElseThrow(
+                () -> new ProjectNotFoundException("Project with id : " + projectId + " not found")
+        );
+
+        ProjectMember owner = projectMemberRepo.findByProjectAndUser(project, user);
+
+        if(owner == null || owner.getStatus() != InvitationStatus.ACTIVE){
+            throw new InsufficientPrivilegesException("You are not an active owner in this project");
+        }
+
+        Users member = userRepo.findUsersByUsername(username);
+
+        ProjectMember projectMember = projectMemberRepo.findByProjectAndUser(project, user);
+
+        if(projectMember == null || projectMember.getStatus() != InvitationStatus.ACTIVE){
+            throw new InsufficientPrivilegesException("user is not a member in this project");
+        }
+
+        return member.getId();
+    }
 }

@@ -161,4 +161,21 @@ public class ProjectController {
 
         return ResponseEntity.status(200).body(response);
     }
+
+    @GetMapping("/{projectId}/getIdByUsername")
+    public ResponseEntity<ApiResponse<Long>> getIdByUsername(@AuthenticationPrincipal UserPrincipal userPrincipal,
+                                                                @RequestParam String username,
+                                                                @PathVariable Long projectId){
+        Users user = userPrincipal.getUser();
+
+        Long userId = projectService.getIdByUsername(username, projectId, user);
+        ApiResponse<Long> response = new ApiResponse<>(
+                true,
+                "Get id Successful",
+                userId
+        );
+
+        return ResponseEntity.status(200).body(response);
+    }
+
 }

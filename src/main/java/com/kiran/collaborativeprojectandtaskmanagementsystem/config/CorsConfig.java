@@ -18,7 +18,7 @@ public class CorsConfig {
                         .allowedHeaders("*")
                         .allowedOrigins("http://localhost:5173",
                                 "https://cptms.vercel.app")
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS");
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH");
             }
         };
 

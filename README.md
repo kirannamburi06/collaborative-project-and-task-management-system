@@ -71,7 +71,7 @@ This project was designed with a strong focus on backend engineering principles 
 - JWT (JSON Web Tokens)
 
 ### Documentation
-- Swagger / OpenAPI (in progress)
+- Swagger / OpenAPI (View documentation at <project-url>/swagger-ui/index.html>
 
 ---
 
@@ -118,7 +118,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ---
 
-## Running the Project
+## Running the Project (Locally)
 
 ### Clone Repository
 
@@ -162,6 +162,139 @@ Application runs on:
 ```text
 http://localhost:8080
 ```
+
+---
+
+# Running the Project with Docker
+
+This project can be run using Docker.
+
+The backend application is containerized using a Dockerfile.
+
+---
+
+# Prerequisites
+
+Make sure the following are installed:
+
+- Docker
+
+Verify Docker installation:
+
+```bash
+docker --version
+```
+
+---
+
+# Project Structure
+
+```text
+project-root/
+│
+├── Dockerfile
+├── pom.xml
+├── src/
+└── ...
+```
+
+---
+
+# Build Docker Image
+
+From the project root:
+
+```bash
+docker build -t project-management-backend .
+```
+
+This command:
+
+- Builds the Spring Boot application
+- Creates a Docker image
+- Packages the backend inside the container
+
+---
+
+# Running with Environment Variables
+
+If the application uses environment variables:
+
+```bash
+docker run \
+-p 8080:8080 \
+-e DB_URL=your_database_url \
+-e DB_USERNAME=your_db_username \
+-e DB_PASSWORD=your_db_password \
+-e JWT_SECRET=your_jwt_secret \
+project-management-backend
+```
+
+---
+
+The backend will now run on:
+
+```text
+http://localhost:8080
+```
+
+---
+
+# Swagger UI
+
+Access Swagger documentation:
+
+```text
+http://localhost:8080/swagger-ui/index.html
+```
+
+---
+
+# View Running Containers
+
+```bash
+docker ps
+```
+
+---
+
+# Stop Container
+
+```bash
+docker stop <container_id>
+```
+
+---
+
+# View Logs
+
+```bash
+docker logs <container_id>
+```
+
+---
+
+# Remove Container
+
+```bash
+docker rm <container_id>
+```
+
+---
+
+# Remove Docker Image
+
+```bash
+docker rmi project-management-backend
+```
+
+---
+
+# Notes
+
+- PostgreSQL should be running separately
+- Environment variables should be configured properly
+- Docker is currently used only for backend containerization
 
 ---
 

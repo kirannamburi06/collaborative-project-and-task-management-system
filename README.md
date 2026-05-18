@@ -6,6 +6,22 @@ This project was designed with a strong focus on backend engineering principles 
 
 ---
 
+## Live API
+
+Base URL:
+https://collaborative-project-and-task.onrender.com
+
+Note: Backend may take a minute to wake up due to Render free tier limitations. Usually 60 seconds (Cold start).
+
+## Swagger Documentation
+
+https://collaborative-project-and-task.onrender.com/swagger-ui/index.html
+
+## Frontend:
+https://cptms.vercel.app
+
+---
+
 ## Features
 
 ### Authentication & Authorization

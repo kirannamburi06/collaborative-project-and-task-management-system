@@ -9,8 +9,12 @@ import com.kiran.collaborativeprojectandtaskmanagementsystem.model.*;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.repository.ProjectMemberRepo;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.repository.ProjectRepo;
 import com.kiran.collaborativeprojectandtaskmanagementsystem.repository.UserRepo;
+import com.kiran.collaborativeprojectandtaskmanagementsystem.util.CacheConstants;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -32,6 +36,10 @@ public class ProjectService {
     private final ActivityLogService activityLogService;
 
     @Transactional
+    @CacheEvict(
+            value = CacheConstants.PROJECT_PAGES,
+            allEntries = true
+    )
     public ProjectResponseDTO createProject(CreateProjectRequestDTO requestDTO, Users user){
 
         Project project = projectMapper.toEntity(requestDTO, user);
@@ -59,6 +67,15 @@ public class ProjectService {
         return projectMapper.toDTO(project);
     }
 
+    @Cacheable(
+            value = CacheConstants.PROJECT_PAGES,
+            key =
+                    "#user.id + '-' + " +
+                    "#status + '-' + " +
+                    "#role + '-' + " +
+                    "#pageable.pageNumber + '-' + " +
+                    "#pageable.pageSize"
+    )
     public PageResponseDTO<ProjectResponseDTO> getProjects(Users user,
                                                            InvitationStatus status,
                                                            ProjectRole role,
@@ -109,6 +126,10 @@ public class ProjectService {
     }
 
     @Transactional
+    @Cacheable(
+            value = CacheConstants.PROJECT,
+            key = "#user.id + '-' + " + "#projectId"
+    )
     public ProjectResponseDTO getProjectById(Users user, Long projectId) {
 
         ProjectProjection projectProjection = projectMemberRepo.findProjectWithId(user, projectId);
@@ -199,6 +220,22 @@ public class ProjectService {
     }
 
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(
+                    value = CacheConstants.PROJECT,
+                    allEntries = true
+            ),
+
+            @CacheEvict(
+                    value = CacheConstants.PROJECT_PAGES,
+                    allEntries = true
+            ),
+
+            @CacheEvict(
+                    value = CacheConstants.INVITATIONS,
+                    key = "#user.id"
+            )
+    })
     public ProjectResponseDTO acceptInvite(Users user, Long id) {
 
         Project project = projectRepo.findById(id).orElseThrow(
@@ -233,6 +270,10 @@ public class ProjectService {
         return null;
     }
 
+    @Cacheable(
+            value = CacheConstants.INVITATIONS,
+            key = "#user.id"
+    )
     public List<ProjectMemberResponseDTO> getAllInvitations(Users user){
 
         List<ProjectMemberResponseDTO> invitations =  projectMemberRepo.findAllInvitationsDTO(user, InvitationStatus.INVITED);
@@ -245,6 +286,10 @@ public class ProjectService {
     }
 
     @Transactional
+    @CacheEvict(
+            value = CacheConstants.INVITATIONS,
+            key = "#user.id"
+    )
     public ProjectResponseDTO rejectInvite(Users user, Long id) {
 
         Project project = projectRepo.findById(id).orElseThrow(
@@ -275,6 +320,17 @@ public class ProjectService {
     }
 
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(
+                    value = CacheConstants.PROJECT,
+                    key = "#user.id + '-' + " + "#projectId"
+            ),
+
+            @CacheEvict(
+                    value = CacheConstants.PROJECT_PAGES,
+                    allEntries = true
+            )
+    })
     public ProjectResponseDTO deleteProject(Long projectId, Users user) {
 
         Project project = projectRepo.findById(projectId).orElseThrow(
@@ -304,6 +360,14 @@ public class ProjectService {
         return projectMapper.toDTO(project);
     }
 
+    @Cacheable(
+            value = CacheConstants.USERS,
+            key =
+                    "#user.id + '-' + " +
+                    "#projectId + '-' + " +
+                    "#username"
+
+    )
     public Long getIdByUsername(String username, Long projectId, Users user) {
 
         Project project = projectRepo.findById(projectId).orElseThrow(
